@@ -34,7 +34,9 @@ const deleteCard = async (req, res) => {
     const cardDelete = await Card.findByIdAndRemove(cardId);
     return res.status(200).send(cardDelete);
   } catch (e) {
-    return res.status(500).send({ message: 'Ошибка по умолчанию.' });
+    if (e.name === 'CastError') {
+      return res.status(400).send({ message: 'Переданы некорректные данные при создании пользователя.' });
+    } return res.status(500).send({ message: 'Ошибка по умолчанию.' });
   }
 };
 
@@ -52,7 +54,7 @@ const likeCard = async (req, res) => {
     );
     return res.status(200).send(cardL);
   } catch (e) {
-    if (e.name === 'ValidationError') {
+    if (e.name === 'ValidationError' || e.name === 'CastError') {
       return res.status(400).send({ message: 'Переданы некорректные данные при создании пользователя.' });
     } return res.status(500).send({ message: 'Ошибка по умолчанию.' });
   }
@@ -70,7 +72,7 @@ const dislikeCard = async (req, res) => {
     }
     return res.status(200).send(card);
   } catch (e) {
-    if (e.name === 'ValidationError') {
+    if (e.name === 'ValidationError' || e.name === 'CastError') {
       return res.status(400).send({ message: 'Переданы некорректные данные при создании пользователя.' });
     } return res.status(500).send({ message: 'Ошибка по умолчанию.' });
   }

@@ -17,7 +17,9 @@ const getUserById = async (req, res) => {
     }
     return res.status(200).send(user);
   } catch (e) {
-    return res.status(500).send({ message: 'Ошибка по умолчанию.' });
+    if (e.name === 'CastError') {
+      return res.status(400).send({ message: 'Переданы некорректные данные при создании пользователя.' });
+    } return res.status(500).send({ message: 'Ошибка по умолчанию.' });
   }
 };
 
@@ -46,7 +48,7 @@ const updateUserInfo = async (req, res) => {
     if (!user) {
       return res.status(404).send({ message: 'Пользователь по указанному _id не найден.' });
     }
-    return res.status(201).send(user);
+    return res.status(200).send(user);
   } catch (e) {
     if (e.name === 'ValidationError') {
       return res.status(400).send({ message: 'Переданы некорректные данные при создании пользователя.' });
@@ -65,7 +67,7 @@ const updateUserAvatar = async (req, res) => {
     if (!user) {
       return res.status(404).send({ message: 'Пользователь по указанному _id не найден.' });
     }
-    return res.status(201).send(user);
+    return res.status(200).send(user);
   } catch (e) {
     if (e.name === 'ValidationError') {
       return res.status(400).send({ message: 'Переданы некорректные данные при создании пользователя.' });
