@@ -60,7 +60,7 @@ const updateUserAvatar = async (req, res) => {
     const user = await User.findByIdAndUpdate(
       req.user._id,
       { avatar },
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     );
     if (!user) {
       return res.status(404).send({ message: 'Пользователь по указанному _id не найден.' });
