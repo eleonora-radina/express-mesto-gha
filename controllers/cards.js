@@ -48,7 +48,7 @@ const likeCard = async (req, res) => {
     const cardL = await Card.findByIdAndUpdate(
       cardId,
       { $addToSet: { likes: req.user._id } },
-      { new: true },
+      { new: true, runValidators: true },
     );
     return res.status(200).send(cardL);
   } catch (e) {
@@ -63,7 +63,7 @@ const dislikeCard = async (req, res) => {
     const card = await Card.findByIdAndUpdate(
       req.params.cardId,
       { $pull: { likes: req.user._id } },
-      { new: true },
+      { new: true, runValidators: true },
     );
     if (!card) {
       return res.status(404).send({ message: 'Карточка с указанным _id не найдена.' });
