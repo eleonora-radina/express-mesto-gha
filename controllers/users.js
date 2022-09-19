@@ -3,7 +3,7 @@ const User = require('../models/user');
 const getUsers = async (req, res) => {
   try {
     const users = await User.find({});
-    res.send(200).send(users);
+    res.status(200).send(users);
   } catch (e) {
     res.status(500).send({ message: 'Ошибка по умолчанию.' });
   }
@@ -15,7 +15,7 @@ const getUserById = async (req, res) => {
     if (!user) {
       return res.status(404).send({ message: 'Пользователь по указанному _id не найден.' });
     }
-    return res.send(200).send(user);
+    return res.status(200).send(user);
   } catch (e) {
     return res.status(500).send({ message: 'Ошибка по умолчанию.' });
   }
