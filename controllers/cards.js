@@ -1,15 +1,20 @@
 const Card = require('../models/card');
 
-const getCards = async (req, res) => {
+const ForbiddenError = require('../errors/ForbiddenError');
+const InternalServerError = require('../errors/InternalServerError');
+const BadRequestError = require('../errors/BadRequestError');
+const NotFoundError = require('../errors/NotFoundError');
+
+const getCards = async (req, res, next) => {
   try {
     const cards = await Card.find({});
     res.status(200).send(cards);
   } catch (e) {
-    res.status(500).send({ message: 'Ошибка по умолчанию.' });
+    next(new InternalServerError('Ошибка по умолчанию.'));
   }
 };
 
-const createCard = async (req, res) => {
+const createCard = async (req, res, next) => {
   try {
     const owner = req.user._id;
     const { name, link } = req.body;
@@ -17,35 +22,39 @@ const createCard = async (req, res) => {
     res.status(201).send(card);
   } catch (e) {
     if (e.name === 'ValidationError') {
-      res.status(400).send({ message: 'Переданы некорректные данные при создании пользователя.' });
+      next(new BadRequestError('Переданы некорректные данные при создании пользователя.'));
     } else {
-      res.status(500).send({ message: 'Ошибка по умолчанию.' });
+      next(new InternalServerError('Ошибка по умолчанию.'));
     }
   }
 };
 
-const deleteCard = async (req, res) => {
+const deleteCard = async (req, res, next) => {
   try {
     const { cardId } = req.params;
+    const userId = req.user._id;
     const card = await Card.findById(cardId);
     if (!card) {
-      return res.status(404).send({ message: 'Карточка с указанным _id не найдена.' });
+      return next(new NotFoundError('Карточка с указанным _id не найдена.'));
+    }
+    if (userId !== card.owner.toString()) {
+      return next(new ForbiddenError('Попытка удалить чужую карточку.'));
     }
     const cardDelete = await Card.findByIdAndRemove(cardId);
     return res.status(200).send(cardDelete);
   } catch (e) {
     if (e.name === 'CastError') {
-      return res.status(400).send({ message: 'Переданы некорректные данные при создании пользователя.' });
-    } return res.status(500).send({ message: 'Ошибка по умолчанию.' });
+      return next(new BadRequestError('Переданы некорректные данные при создании пользователя.'));
+    } return next(new InternalServerError('Ошибка по умолчанию.'));
   }
 };
 
-const likeCard = async (req, res) => {
+const likeCard = async (req, res, next) => {
   try {
     const { cardId } = req.params;
     const card = await Card.findById(cardId);
     if (!card) {
-      return res.status(404).send({ message: 'Карточка с указанным _id не найдена.' });
+      return next(new NotFoundError('Карточка с указанным _id не найдена.'));
     }
     const cardL = await Card.findByIdAndUpdate(
       cardId,
@@ -55,12 +64,12 @@ const likeCard = async (req, res) => {
     return res.status(200).send(cardL);
   } catch (e) {
     if (e.name === 'ValidationError' || e.name === 'CastError') {
-      return res.status(400).send({ message: 'Переданы некорректные данные при создании пользователя.' });
-    } return res.status(500).send({ message: 'Ошибка по умолчанию.' });
+      return next(new BadRequestError('Переданы некорректные данные при создании пользователя.'));
+    } return next(new InternalServerError('Ошибка по умолчанию.'));
   }
 };
 
-const dislikeCard = async (req, res) => {
+const dislikeCard = async (req, res, next) => {
   try {
     const card = await Card.findByIdAndUpdate(
       req.params.cardId,
@@ -68,13 +77,13 @@ const dislikeCard = async (req, res) => {
       { new: true, runValidators: true },
     );
     if (!card) {
-      return res.status(404).send({ message: 'Карточка с указанным _id не найдена.' });
+      return next(new NotFoundError('Карточка с указанным _id не найдена.'));
     }
     return res.status(200).send(card);
   } catch (e) {
     if (e.name === 'ValidationError' || e.name === 'CastError') {
-      return res.status(400).send({ message: 'Переданы некорректные данные при создании пользователя.' });
-    } return res.status(500).send({ message: 'Ошибка по умолчанию.' });
+      return next(new BadRequestError('Переданы некорректные данные при создании пользователя.'));
+    } return next(new InternalServerError('Ошибка по умолчанию.'));
   }
 };
 
