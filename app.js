@@ -11,7 +11,7 @@ const { createUser, login } = require('./controllers/users');
 const auth = require('./middlewares/auth');
 const errorHandler = require('./middlewares/error');
 
-const BadRequestError = require('./errors/BadRequestError');
+const NotFoundError = require('./errors/NotFoundError');
 
 const { PORT = 3000 } = process.env;
 
@@ -48,7 +48,7 @@ app.use('/cards', require('./routes/cards'));
 app.use(errors());
 
 app.use((req, res, next) => {
-  next(new BadRequestError('Страница не найдена'));
+  next(new NotFoundError('Страница не найдена'));
 });
 
 app.use(errorHandler);

@@ -21,7 +21,7 @@ const createUser = async (req, res, next) => {
     const user = await User.create({
       name, about, avatar, email, password: hashedPassword,
     });
-    return res.status(201).send(user);
+    return res.status(200).send(user);
   } catch (e) {
     if (e.code === 11000) {
       return next(new ConflictError('Данный email уже существует.'));
