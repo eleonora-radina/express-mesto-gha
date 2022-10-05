@@ -47,7 +47,7 @@ const login = async (req, res, next) => {
     const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
     res.cookie('jwt', token, { httpOnly: true, sameSite: true });
 
-    return res.status(201).send(user.toJSON());
+    return res.status(200).send(user.toJSON());
   } catch (e) {
     if (e.name === 'CastError') {
       return next(new BadRequestError('Переданы некорректные данные при создании пользователя.'));
