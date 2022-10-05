@@ -21,7 +21,7 @@ const createUser = async (req, res, next) => {
     const user = await User.create({
       name, about, avatar, email, password: hashedPassword,
     });
-    return res.status(201).send(user);
+    return res.status(200).send(user);
   } catch (e) {
     if (e.code === 11000) {
       return next(new ConflictError('Данный email уже существует.'));
@@ -47,7 +47,7 @@ const login = async (req, res, next) => {
     const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
     res.cookie('jwt', token, { httpOnly: true, sameSite: true });
 
-    return res.status(201).send(user.toJSON());
+    return res.status(200).send(user.toJSON());
   } catch (e) {
     if (e.name === 'CastError') {
       return next(new BadRequestError('Переданы некорректные данные при создании пользователя.'));
