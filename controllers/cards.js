@@ -52,15 +52,16 @@ const deleteCard = async (req, res, next) => {
 const likeCard = async (req, res, next) => {
   try {
     const { cardId } = req.params;
-    const card = await Card.findById(cardId);
-    if (!card) {
-      return next(new NotFoundError('Карточка с указанным _id не найдена.'));
-    }
+
     const cardL = await Card.findByIdAndUpdate(
       cardId,
       { $addToSet: { likes: req.user._id } },
       { new: true, runValidators: true },
     );
+    if (!cardL) {
+      return next(new NotFoundError('Карточка с указанным _id не найдена.'));
+    }
+
     return res.send(cardL);
   } catch (e) {
     if (e.name === 'ValidationError' || e.name === 'CastError') {

@@ -49,9 +49,7 @@ const login = async (req, res, next) => {
 
     return res.send(user.toJSON());
   } catch (e) {
-    if (e.name === 'CastError') {
-      return next(new BadRequestError('Переданы некорректные данные при создании пользователя.'));
-    } return next(new InternalServerError('Ошибка по умолчанию.'));
+    return next(new BadRequestError('Переданы некорректные данные при создании пользователя.'));
   }
 };
 
