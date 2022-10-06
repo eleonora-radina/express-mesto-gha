@@ -8,7 +8,7 @@ const NotFoundError = require('../errors/NotFoundError');
 const getCards = async (req, res, next) => {
   try {
     const cards = await Card.find({});
-    res.status(200).send(cards);
+    res.send(cards);
   } catch (e) {
     next(new InternalServerError('Ошибка по умолчанию.'));
   }
@@ -41,7 +41,7 @@ const deleteCard = async (req, res, next) => {
       return next(new ForbiddenError('Попытка удалить чужую карточку.'));
     }
     const cardDelete = await Card.findByIdAndRemove(cardId);
-    return res.status(200).send(cardDelete);
+    return res.send(cardDelete);
   } catch (e) {
     if (e.name === 'CastError') {
       return next(new BadRequestError('Переданы некорректные данные при создании пользователя.'));
@@ -52,16 +52,17 @@ const deleteCard = async (req, res, next) => {
 const likeCard = async (req, res, next) => {
   try {
     const { cardId } = req.params;
-    const card = await Card.findById(cardId);
-    if (!card) {
-      return next(new NotFoundError('Карточка с указанным _id не найдена.'));
-    }
+
     const cardL = await Card.findByIdAndUpdate(
       cardId,
       { $addToSet: { likes: req.user._id } },
       { new: true, runValidators: true },
     );
-    return res.status(200).send(cardL);
+    if (!cardL) {
+      return next(new NotFoundError('Карточка с указанным _id не найдена.'));
+    }
+
+    return res.send(cardL);
   } catch (e) {
     if (e.name === 'ValidationError' || e.name === 'CastError') {
       return next(new BadRequestError('Переданы некорректные данные при создании пользователя.'));
@@ -79,7 +80,7 @@ const dislikeCard = async (req, res, next) => {
     if (!card) {
       return next(new NotFoundError('Карточка с указанным _id не найдена.'));
     }
-    return res.status(200).send(card);
+    return res.send(card);
   } catch (e) {
     if (e.name === 'ValidationError' || e.name === 'CastError') {
       return next(new BadRequestError('Переданы некорректные данные при создании пользователя.'));
