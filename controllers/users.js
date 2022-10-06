@@ -21,7 +21,7 @@ const createUser = async (req, res, next) => {
     const user = await User.create({
       name, about, avatar, email, password: hashedPassword,
     });
-    return res.status(200).send(user);
+    return res.send(user);
   } catch (e) {
     if (e.code === 11000) {
       return next(new ConflictError('Данный email уже существует.'));
@@ -47,7 +47,7 @@ const login = async (req, res, next) => {
     const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
     res.cookie('jwt', token, { httpOnly: true, sameSite: true });
 
-    return res.status(200).send(user.toJSON());
+    return res.send(user.toJSON());
   } catch (e) {
     if (e.name === 'CastError') {
       return next(new BadRequestError('Переданы некорректные данные при создании пользователя.'));
@@ -58,7 +58,7 @@ const login = async (req, res, next) => {
 const getUsers = async (req, res, next) => {
   try {
     const users = await User.find({});
-    res.status(200).send(users);
+    res.send(users);
   } catch (e) {
     next(new InternalServerError('Ошибка по умолчанию.'));
   }
@@ -71,7 +71,7 @@ const getUserById = async (req, res, next) => {
     if (!user) {
       return next(new NotFoundError('Пользователь по указанному _id не найден.'));
     }
-    return res.status(200).send(user);
+    return res.send(user);
   } catch (e) {
     if (e.name === 'CastError') {
       return next(new BadRequestError('Переданы некорректные данные при создании пользователя.'));
@@ -86,7 +86,7 @@ const getAuthorizedUser = async (req, res, next) => {
     if (!user) {
       return next(new NotFoundError('Пользователь по указанному _id не найден.'));
     }
-    return res.status(200).send(user);
+    return res.send(user);
   } catch (e) {
     return next(new InternalServerError('Ошибка по умолчанию.'));
   }
@@ -103,7 +103,7 @@ const updateUserInfo = async (req, res, next) => {
     if (!user) {
       return next(new NotFoundError('Пользователь по указанному _id не найден.'));
     }
-    return res.status(200).send(user);
+    return res.send(user);
   } catch (e) {
     if (e.name === 'ValidationError') {
       return next(new BadRequestError('Переданы некорректные данные при создании пользователя.'));
@@ -122,7 +122,7 @@ const updateUserAvatar = async (req, res, next) => {
     if (!user) {
       return next(new NotFoundError('Пользователь по указанному _id не найден.'));
     }
-    return res.status(200).send(user);
+    return res.send(user);
   } catch (e) {
     if (e.name === 'ValidationError') {
       return next(new BadRequestError('Переданы некорректные данные при создании пользователя.'));
